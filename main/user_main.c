@@ -212,6 +212,7 @@ i2c_ads1115_read_uint16_t(i2c_port_t i2c_num, uint16_t *data)
     i2c_master_read(cmd, i2c_ads1115_read_buffer, 2, I2C_MASTER_LAST_NACK);
     i2c_master_stop(cmd);
     esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_RATE_MS);
+    *data = ((uint16_t)i2c_ads1115_read_buffer[1] << 8) | ((uint16_t)i2c_ads1115_read_buffer[0]);
     i2c_cmd_link_delete(cmd);
 
     return ret;
