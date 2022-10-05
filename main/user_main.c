@@ -89,6 +89,19 @@ static const uint16_t config_bits = 0xC483;
  */
 static uint8_t i2c_ads1115_read_buffer[2] = { 0, 0 };
 
+static int16_t i2c_u16_to_i16(uint16_t num) {
+    int16_t converted;
+    if (num > 0x7FFF)
+    {
+        converted = (int16_t)num;
+    } else {
+        converted = (int16_t) (num - 0x8000);
+        converted = -converted;
+    }
+    
+    return converted;
+}
+
 /**
  * @brief i2c master initialization
  */
@@ -218,6 +231,7 @@ i2c_ads1115_read_uint16_t(i2c_port_t i2c_num, uint16_t *data)
     return ret;
 }
 
+// TODO: Comment
 static esp_err_t
 i2c_ads1115_init(i2c_port_t i2c_num)
 {
@@ -227,6 +241,7 @@ i2c_ads1115_init(i2c_port_t i2c_num)
     return ret;
 }
 
+// TODO: Comment
 static void
 i2c_ads1115_task(void *arg)
 {
@@ -246,7 +261,7 @@ i2c_ads1115_task(void *arg)
             continue;
         }
         
-        ESP_LOGI(TAG, "Raw ADC Reading: %d", sensor_reading);
+        ESP_LOGI(TAG, "Raw ADC Reading: %d", i2c_u16_to_i16(sensor_reading));
         
         vTaskDelay(100 / portTICK_RATE_MS);
     }
@@ -254,6 +269,7 @@ i2c_ads1115_task(void *arg)
     i2c_driver_delete(I2C_ADS1115_MASTER_NUM);
 }
 
+// TODO: Comment
 void
 app_main(void)
 {
