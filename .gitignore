@@ -45,3 +45,4 @@ docs/doxygen_sqlite3.db
 
 # Build files
 build
+compile_flags.txt
