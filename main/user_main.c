@@ -12,29 +12,17 @@ static const char *TAG = "main";
  * COMP_*: Disabled Comparator
  * Bits: 1_100_010_0_100_00011
  */
-static const uint16_t config_bits = 0xC483;
+static const uint16_t config_bits = 0b1100001010000011;
 
 /**
  * @brief Read buffer for reading uint16_t from ADS1115
  */
 static uint8_t i2c_ads1115_read_buffer[2] = { 0, 0 };
 
-static int16_t
-i2c_ads1115_u16_to_i16(uint16_t num)
-{
-    int16_t converted;
-    if (num > 0x7FFF)
-    {
-        converted = (int16_t)num;
-    }
-    else
-    {
-        converted = (int16_t)(num - 0x8000);
-        converted = -converted;
-    }
-
-    return converted;
-}
+/**
+* fixed point approximation of 3.3/65535 in a 2:30 fixed point
+*/
+static const uint32_t MAX_VOLTAGE = 54068;
 
 static esp_err_t
 i2c_init()
@@ -122,6 +110,7 @@ i2c_ads1115_task(void *arg)
 
     esp_err_t ret;
     uint16_t  sensor_reading;
+    uint32_t voltage_reading;
     while (1)
     {
         memset(i2c_ads1115_read_buffer, 0, 2);
@@ -134,8 +123,8 @@ i2c_ads1115_task(void *arg)
                      esp_err_to_name(ret));
             continue;
         }
-
-        ESP_LOGI(TAG, "Raw ADC Reading: %d", i2c_ads1115_u16_to_i16(sensor_reading));
+        voltage_reading = ((uint32_t)sensor_reading) * MAX_VOLTAGE;
+        ESP_LOGI(TAG, "ADC Reading: %u.%u V (RAW VALUE: %u)", (voltage_reading >> 30), (voltage_reading & 0xC0000000), sensor_reading);
 
         vTaskDelay(100 / portTICK_RATE_MS);
     }

@@ -75,7 +75,7 @@ typedef enum
  *
  * @return the int16_t representation of num
  */
-static int16_t i2c_ads1115_u16_to_i16(uint16_t num);
+//static int16_t i2c_ads1115_u16_to_i16(uint16_t num);
 
 /**
  * @brief Initialize the i2c interface
